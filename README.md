@@ -28,7 +28,5 @@ Open `index.html`. Questions are in the `QUESTIONS` array at the top of the scri
 
 ## Files
 - `index.html` is the whole app.
-- `PLAN.md` is the brief it was built from.
-- `original/MBTI_Quiz.html` is the first version, kept unchanged for comparison.
 
 MBTI is a fun lens for self-reflection, not a scientific diagnosis.
