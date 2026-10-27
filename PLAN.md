@@ -58,7 +58,7 @@ The structure is sound and should survive:
 ## 3. The new look: "human" means looking made by a person on purpose
 
 ### Recommended direction: **flat "sticker" / neo-brutalist UI that matches her art**
-Her illustration style (memory chip): **flat solid colour, bold clean single-weight outlines, minimal shading, one solid background colour per piece.** A UI built on the same rules will look like hers, not like a template.
+Her illustration style: **flat solid colour, bold clean single-weight outlines, minimal shading, one solid background colour per piece.** A UI built on the same rules will look like hers, not like a template.
 
 Neo-brutalism is the established web version of exactly that:
 - **Solid fills, no gradients.**

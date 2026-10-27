@@ -88,7 +88,7 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
 .dot:nth-child(1), .dot:nth-child(5) { width: 56px; height: 56px; }
 .dot:nth-child(2), .dot:nth-child(4) { width: 48px; height: 48px; }
 .dot:nth-child(3) { width: 44px; height: 44px; }
-.dot:hover { background: var(--blue); }
+@media (hover: hover) { .dot:hover { background: var(--blue); } }
 .dot[aria-pressed="true"] { background: var(--ink); }
 .ends { display: flex; justify-content: space-between; margin-top: 6px; font-weight: 800; font-size: .9rem; }
 .ends span:nth-child(1), .ends span:nth-child(3) { width: 56px; text-align: center; }
@@ -100,7 +100,7 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
 .type { display: flex; gap: 10px; margin-bottom: 16px; }
 .letter {
   flex: 1; height: 84px; display: grid; place-items: center;
-  background: var(--yellow); border: var(--line); border-radius: 10px; box-shadow: var(--shadow);
+  border: var(--line); border-radius: 10px; box-shadow: var(--shadow);
   font-size: 2.6rem; font-weight: 800; animation: stamp .25s ease-out both;
 }
 .letter.close { border-style: dashed; font-size: 1.5rem; }
@@ -187,7 +187,7 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
 
   <section id="start">
     <span class="sticker">about <span id="mins">5</span> min</span>
-    <h1 tabindex="-1">Which MBTI type fits you, roughly?</h1>
+    <h1 id="startTitle" tabindex="-1">Which MBTI type fits you, roughly?</h1>
     <p class="lead"><span id="count">28</span> everyday situations. For each one, pick the side you would actually lean toward, not the one that sounds nicer.</p>
     <p class="small">Nothing is saved or sent anywhere. Everything stays in your browser. It's a fun lens, not a diagnosis.</p>
     <button class="btn" id="startBtn" type="button">Start</button>
@@ -428,6 +428,7 @@ function render() {
   });
   $("backBtn").disabled = idx === 0;
   locked = false;
+  window.scrollTo(0, 0);
 }
 
 function pick(v) {
@@ -612,7 +613,7 @@ function init() {
   $("startBtn").addEventListener("click", begin);
   $("backBtn").addEventListener("click", back);
   $("rankMore").addEventListener("click", () => setRankExpanded(!$("rankMore").dataset.expanded));
-  $("retakeBtn").addEventListener("click", () => { show("start"); });
+  $("retakeBtn").addEventListener("click", () => { show("start"); $("startTitle").focus({ preventScroll: true }); });
   document.addEventListener("keydown", (e) => {
     if ($("quiz").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
     if (/^[1-5]$/.test(e.key)) pick(Number(e.key) - 3);
