@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MBTI Quiz Lite</title>
+<meta name="description" content="A short MBTI quiz built on everyday situations. By Frianz13.">
+<style>
+:root {
+  --bg: #FFF8EC;
+  --ink: #2B1D14;
+  --yellow: #FCD98A;
+  --pink: #F7B6C2;
+  --blue: #9CC3E6;
+  --white: #FFFFFF;
+  --line: 3px solid var(--ink);
+  --shadow: 5px 5px 0 var(--ink);
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+}
+[hidden] { display: none !important; }
+.wrap { max-width: 620px; margin: 0 auto; padding: 16px 16px 56px; }
+
+.top {
+  display: flex; justify-content: space-between; align-items: baseline;
+  border-bottom: var(--line); padding-bottom: 10px; margin-bottom: 28px;
+  font-weight: 800;
+}
+.top .by { font-weight: 600; font-size: .9rem; }
+
+h1, h2 { margin: 0; line-height: 1.15; }
+h1 { font-size: 2rem; margin-bottom: 16px; }
+[tabindex="-1"]:focus { outline: none; }
+.lead { font-size: 1.1rem; margin: 0 0 12px; }
+.small { font-size: .92rem; margin: 0 0 28px; }
+
+.sticker {
+  display: inline-block; background: var(--yellow); border: var(--line);
+  padding: 2px 10px; font-weight: 800; font-size: .9rem; margin-bottom: 14px;
+  transform: rotate(-3deg);
+}
+
+.btn {
+  font: inherit; font-weight: 800; color: var(--ink);
+  background: var(--yellow); border: var(--line); border-radius: 8px;
+  padding: 12px 28px; min-height: 48px; cursor: pointer;
+  box-shadow: 4px 4px 0 var(--ink);
+}
+.btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+.btn.ghost { background: var(--white); }
+.btn[disabled] { opacity: .45; cursor: default; }
+:focus-visible { outline: 3px solid var(--blue); outline-offset: 3px; }
+
+/* quiz */
+.progress { display: flex; align-items: center; gap: 12px; margin-bottom: 22px; font-weight: 800; }
+.progress .track { flex: 1; height: 16px; border: var(--line); background: var(--white); border-radius: 6px; overflow: hidden; }
+.progress .fill { height: 100%; width: 0; background: var(--yellow); border-right: var(--line); transition: width .25s; }
+#situation { font-size: 1.5rem; margin-bottom: 20px; }
+
+.stmt {
+  position: relative; border: var(--line); border-radius: 10px; box-shadow: var(--shadow);
+  padding: 14px 16px 14px 60px; min-height: 76px; display: flex; align-items: center;
+}
+.stmt p { margin: 0; font-size: 1.08rem; }
+.stmt.a { background: var(--yellow); }
+.stmt.b { background: var(--pink); }
+.tag {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  width: 32px; height: 32px; display: grid; place-items: center;
+  background: var(--white); border: var(--line); border-radius: 6px; font-weight: 800;
+}
+.scale { margin: 22px 0; }
+.dots { display: flex; justify-content: space-between; align-items: center; }
+.dot {
+  border: var(--line); border-radius: 50%; background: var(--white);
+  cursor: pointer; padding: 0; color: var(--ink);
+}
+.dot:nth-child(1), .dot:nth-child(5) { width: 56px; height: 56px; }
+.dot:nth-child(2), .dot:nth-child(4) { width: 48px; height: 48px; }
+.dot:nth-child(3) { width: 44px; height: 44px; }
+.dot:hover { background: var(--blue); }
+.dot[aria-pressed="true"] { background: var(--ink); }
+.ends { display: flex; justify-content: space-between; margin-top: 6px; font-weight: 800; font-size: .9rem; }
+.ends span:nth-child(2) { font-weight: 600; }
+#backBtn { margin-top: 28px; }
+
+/* result */
+.eyebrow { margin: 0 0 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; font-size: .85rem; }
+.type { display: flex; gap: 10px; margin-bottom: 16px; }
+.letter {
+  flex: 1; height: 84px; display: grid; place-items: center;
+  background: var(--yellow); border: var(--line); border-radius: 10px; box-shadow: var(--shadow);
+  font-size: 2.6rem; font-weight: 800; animation: stamp .25s ease-out both;
+}
+.letter.close { background: var(--pink); font-size: 1.5rem; }
+@keyframes stamp { from { transform: scale(1.35); opacity: 0; } to { transform: none; opacity: 1; } }
+.note { border: var(--line); border-radius: 10px; background: var(--white); padding: 10px 14px; margin: 0 0 24px; font-size: .98rem; }
+.bar { margin: 16px 0; }
+.axname { font-weight: 800; margin-bottom: 4px; }
+.bar .row { display: flex; justify-content: space-between; font-size: .95rem; margin-bottom: 4px; }
+.bar .row .win { font-weight: 800; }
+.bar .tr { height: 24px; border: var(--line); border-radius: 6px; background: var(--white); display: flex; overflow: hidden; }
+.bar .f { height: 100%; width: 0; transition: width .5s; }
+.bar .f.first { background: var(--yellow); border-right: var(--line); }
+.bar .f.second { background: var(--pink); border-left: var(--line); margin-left: auto; }
+.about { margin-top: 28px; border: var(--line); border-radius: 10px; background: var(--white); box-shadow: var(--shadow); padding: 18px 18px 8px; }
+.about h2 { font-size: 1.3rem; margin-bottom: 8px; }
+.about ul { margin: 0 0 14px; padding-left: 20px; }
+.about li { margin-bottom: 6px; }
+.weak { background: var(--blue); border: var(--line); border-radius: 8px; padding: 10px 12px; margin: 0 0 14px; }
+.foot { font-size: .9rem; margin: 22px 0; }
+
+@media (max-width: 400px) {
+  h1 { font-size: 1.7rem; }
+  #situation { font-size: 1.3rem; }
+  .letter { height: 70px; font-size: 2.2rem; }
+  .letter.close { font-size: 1.2rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top"><span>MBTI Quiz Lite</span><span class="by">by Frianz13</span></header>
+
+  <section id="start">
+    <span class="sticker">about <span id="mins">5</span> min</span>
+    <h1 tabindex="-1">Which MBTI type fits you, roughly?</h1>
+    <p class="lead"><span id="count">28</span> everyday situations. For each one, pick the side you would actually lean toward, not the one that sounds nicer.</p>
+    <p class="small">Nothing is saved or sent anywhere. Everything stays in your browser. It's a fun lens, not a diagnosis.</p>
+    <button class="btn" id="startBtn" type="button">Start</button>
+  </section>
+
+  <section id="quiz" hidden>
+    <div class="progress"><span id="pnum">1 / 28</span><div class="track"><div class="fill" id="pfill"></div></div></div>
+    <h2 id="situation" tabindex="-1"></h2>
+    <div class="stmt a"><span class="tag">A</span><p id="left"></p></div>
+    <div class="scale" role="group" aria-label="How much do you lean toward A or B?">
+      <div class="dots" id="dots"></div>
+      <div class="ends"><span>A</span><span>both</span><span>B</span></div>
+    </div>
+    <div class="stmt b"><span class="tag">B</span><p id="right"></p></div>
+    <button class="btn ghost" id="backBtn" type="button">Back</button>
+  </section>
+
+  <section id="result" hidden>
+    <p class="eyebrow" id="resultEyebrow" tabindex="-1">Your result</p>
+    <div class="type" id="typeBoxes"></div>
+    <p class="note" id="closeNote" hidden></p>
+    <div id="bars"></div>
+    <div class="about" id="about">
+      <h2 id="aboutTitle"></h2>
+      <ul id="aboutLines"></ul>
+      <p class="weak" id="aboutWeak"></p>
+    </div>
+    <p class="foot">MBTI is a fun lens for self-reflection, not a scientific diagnosis.</p>
+    <button class="btn" id="retakeBtn" type="button">Retake</button>
+  </section>
+</main>
+
+<script>
+/* ---------- DATA: edit questions here ----------
+   Each item: axis, a concrete situation, two statements (left / right),
+   and which pole the LEFT statement points to. Left/right is mixed on purpose
+   so there is no "always agree" pattern. 7 per axis keeps ties impossible. */
+const AXES = [
+  { key: "EI", first: "E", second: "I", label: "Social energy" },
+  { key: "SN", first: "S", second: "N", label: "How you take in information" },
+  { key: "TF", first: "T", second: "F", label: "How you decide" },
+  { key: "JP", first: "J", second: "P", label: "How you handle plans" }
+];
+
+const QUESTIONS = [
+  /* E / I */
+  { axis: "EI", leftPole: "E", situation: "Free Saturday, no plans.",
+    left: "You message people to see who's around.",
+    right: "You're relieved and keep it that way." },
+  { axis: "EI", leftPole: "I", situation: "You're stuck in a long queue.",
+    left: "You scroll your phone and let the time pass.",
+    right: "You end up chatting with whoever is next to you." },
+  { axis: "EI", leftPole: "I", situation: "After a long day full of people.",
+    left: "You want a quiet room and nobody talking to you.",
+    right: "You want to keep going, maybe grab food with someone." },
+  { axis: "EI", leftPole: "E", situation: "You have a half-formed idea.",
+    left: "You talk it out with someone to figure out what you think.",
+    right: "You think it through alone first, then share it." },
+  { axis: "EI", leftPole: "I", situation: "You walk into a room where you only know one person.",
+    left: "You stay near them until you warm up.",
+    right: "You start introducing yourself around." },
+  { axis: "EI", leftPole: "E", situation: "A friend calls instead of texting.",
+    left: "Good, you'd rather just talk.",
+    right: "You kind of wish they'd texted first." },
+  { axis: "EI", leftPole: "E", situation: "A big family gathering.",
+    left: "You move around and talk to everyone.",
+    right: "You find one or two people and stay with them." },
+
+  /* S / N */
+  { axis: "SN", leftPole: "S", situation: "A lecturer gives an assignment with no example.",
+    left: "You look for last year's version first.",
+    right: "You start with your own take straight away." },
+  { axis: "SN", leftPole: "N", situation: "You're learning a new app.",
+    left: "You skim it, get the general idea, then improvise.",
+    right: "You follow the steps one by one." },
+  { axis: "SN", leftPole: "S", situation: "Someone describes a place they just visited.",
+    left: "You ask what it looked like, what they ate, how much it cost.",
+    right: "You ask what it felt like and what it reminded them of." },
+  { axis: "SN", leftPole: "N", situation: "Your mind drifts during a boring class.",
+    left: "It drifts to what-if scenarios and made-up worlds.",
+    right: "It drifts to things that might really happen this week." },
+  { axis: "SN", leftPole: "S", situation: "You're reading a story.",
+    left: "You care most about what actually happens.",
+    right: "You care most about what it's really about underneath." },
+  { axis: "SN", leftPole: "N", situation: "Something keeps breaking.",
+    left: "You hunt for a smarter way so it never breaks again.",
+    right: "You fix it the way it was fixed before." },
+  { axis: "SN", leftPole: "S", situation: "Giving someone directions.",
+    left: "\"Turn left at the red shop, then take the second street.\"",
+    right: "\"Head toward the market, you'll see it.\"" },
+
+  /* T / F */
+  { axis: "TF", leftPole: "T", situation: "A friend vents about a problem that's clearly their own fault.",
+    left: "You point out what went wrong.",
+    right: "You listen first and leave the fault for later." },
+  { axis: "TF", leftPole: "F", situation: "Two people on your team disagree.",
+    left: "You back whichever option keeps everyone on good terms.",
+    right: "You back whichever argument holds up better." },
+  { axis: "TF", leftPole: "T", situation: "You have to give feedback on someone's work.",
+    left: "You say exactly what's weak, politely but clearly.",
+    right: "You start with what works and soften the rest." },
+  { axis: "TF", leftPole: "F", situation: "A rule seems unfair in one person's case.",
+    left: "You'd bend it for them.",
+    right: "You'd keep it, because rules only work if they apply to everyone." },
+  { axis: "TF", leftPole: "T", situation: "Choosing between two offers.",
+    left: "You list pay, hours and growth and compare.",
+    right: "You pick the one that feels right when you imagine being there." },
+  { axis: "TF", leftPole: "F", situation: "Someone cries over something you think is minor.",
+    left: "You feel for them first and sort out the why later.",
+    right: "You're a bit confused and want to understand why." },
+  { axis: "TF", leftPole: "F", situation: "Arguing with someone you like.",
+    left: "You'd drop the point to keep things calm.",
+    right: "You want to win the point if you're right." },
+
+  /* J / P */
+  { axis: "JP", leftPole: "J", situation: "The deadline is a week away.",
+    left: "You start chipping at it today.",
+    right: "You already know it's happening the night before." },
+  { axis: "JP", leftPole: "P", situation: "Tomorrow.",
+    left: "You'll see how it goes.",
+    right: "You roughly know it hour by hour." },
+  { axis: "JP", leftPole: "P", situation: "A friend invites you out in an hour.",
+    left: "Sure, plans can be rearranged.",
+    right: "You'd rather have known earlier, you had a plan." },
+  { axis: "JP", leftPole: "J", situation: "Your desk or room.",
+    left: "Everything has a place, and you notice when it's off.",
+    right: "It's messy, but you know where everything is." },
+  { axis: "JP", leftPole: "P", situation: "A small decision.",
+    left: "You keep your options open until you really have to pick.",
+    right: "You decide fast so it's off your mind." },
+  { axis: "JP", leftPole: "J", situation: "A task is half done and something more interesting turns up.",
+    left: "You finish first, then go.",
+    right: "You follow what's interesting and come back later." },
+  { axis: "JP", leftPole: "P", situation: "Packing for a weekend away.",
+    left: "You throw things in shortly before leaving.",
+    right: "You pack the night before, from a list." }
+];
+
+/* Short, plain descriptions. Each has a weak spot on purpose. */
+const TYPES = {
+  ISTJ: { lines: ["Likes things done properly and in order.", "Remembers what was promised and expects the same back.", "Stays calm and steady when others panic."],
+          weak: "Can treat \"how it's always been done\" as proof it's right, and resist change for too long." },
+  ISFJ: { lines: ["Notices what people need before they ask.", "Quietly keeps things running for the people they care about.", "Prefers familiar routines and familiar people."],
+          weak: "Says yes too often, then resents it without ever saying so." },
+  INFJ: { lines: ["Reads people and patterns more than facts.", "Cares about what things mean, not only what they are.", "Holds firm values and keeps a small circle."],
+          weak: "Decides what someone thinks from a few clues and can be wrong with full confidence." },
+  INTJ: { lines: ["Builds long-term plans and likes seeing how a system fits together.", "Prefers working alone on hard problems.", "Has little patience for slow or vague discussion."],
+          weak: "Can be dismissive of ideas they didn't come up with, and forgets to say what they're pleased about." },
+  ISTP: { lines: ["Learns by taking things apart and trying them.", "Calm in a crisis, quiet the rest of the time.", "Dislikes being told how to do what they can simply figure out."],
+          weak: "Goes silent or disappears when something needs a conversation, not a fix." },
+  ISFP: { lines: ["Lives in the moment and notices small things: colour, taste, mood.", "Gentle and private, but quietly stubborn about their values.", "Shows care through actions more than speeches."],
+          weak: "Avoids confrontation until it builds up, then leaves instead of talking." },
+  INFP: { lines: ["Lives in a rich inner world of ideas, stories and what-ifs.", "Cares a lot about being true to themselves.", "Slow to open up, loyal once they do."],
+          weak: "Starts more than they finish, and measures real people against an ideal." },
+  INTP: { lines: ["Happiest taking a problem apart to see how it works.", "Likes precision and will correct a small error even in small talk.", "Can spend a long time inside their own head."],
+          weak: "Knows a lot and starts little, because the plan was never quite perfect." },
+  ESTP: { lines: ["Acts first and adjusts along the way.", "Reads a room fast and is good in tense moments.", "Gets bored with long planning."],
+          weak: "Underestimates long-term consequences and treats rules as optional." },
+  ESFP: { lines: ["Pulls people in and makes the plan more fun.", "Lives in the present and is generous with it.", "Hates being stuck inside or stuck still."],
+          weak: "Puts off the boring, important thing, and bad news, for as long as possible." },
+  ENFP: { lines: ["Sees a possibility in almost everything and almost everyone.", "Gets energy from people and new ideas.", "Cares about meaning but dislikes routine."],
+          weak: "Starts many things, finishes few, and gets restless when the novelty fades." },
+  ENTP: { lines: ["Likes to argue a side for fun and find the hole in an idea.", "Quick, funny and comfortable improvising.", "Bored by repeating something already solved."],
+          weak: "Can win the argument and lose the person, and drops a project the moment it turns routine." },
+  ESTJ: { lines: ["Takes charge, makes a plan, expects it to be followed.", "Values clear rules, fair treatment and getting it done.", "Says what they think plainly."],
+          weak: "Can steamroll people who work differently, and mistake \"my way works\" for \"the only way\"." },
+  ESFJ: { lines: ["Keeps everyone in the group looped in and looked after.", "Remembers birthdays, preferences, who isn't talking to whom.", "Likes harmony and shared routines."],
+          weak: "Takes criticism of their plans as criticism of them, and nudges people toward what's \"expected\"." },
+  ENFJ: { lines: ["Reads a group's mood and steers it.", "Often ends up organising other people's growth.", "Warm, persuasive, driven by what could be better."],
+          weak: "Takes on other people's problems as their own and ignores their own needs until they run out." },
+  ENTJ: { lines: ["Sets a goal, builds the plan and pulls people along.", "Direct, decisive and comfortable leading.", "Has little patience for inefficiency."],
+          weak: "Can run over feelings in a hurry, and reads \"nobody pushed back\" as \"everyone agreed\"." }
+};
+
+/* ---------- LOGIC ---------- */
+const ORDER = interleave(QUESTIONS);
+let idx = 0;
+let answers = [];
+let locked = false;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const $ = (id) => document.getElementById(id);
+
+function interleave(list) {
+  const groups = AXES.map(a => list.filter(q => q.axis === a.key));
+  const rounds = Math.max(...groups.map(g => g.length));
+  const out = [];
+  for (let i = 0; i < rounds; i++) groups.forEach(g => { if (g[i]) out.push(g[i]); });
+  return out;
+}
+
+function show(id) {
+  ["start", "quiz", "result"].forEach(s => { $(s).hidden = s !== id; });
+  window.scrollTo(0, 0);
+}
+
+function buildDots() {
+  const wrap = $("dots");
+  const names = ["Strongly A", "Leaning A", "Both equally", "Leaning B", "Strongly B"];
+  [-2, -1, 0, 1, 2].forEach((v, i) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "dot";
+    b.dataset.v = v;
+    b.setAttribute("aria-label", names[i]);
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => pick(v));
+    wrap.appendChild(b);
+  });
+}
+
+function render() {
+  const q = ORDER[idx];
+  const n = ORDER.length;
+  $("pnum").textContent = (idx + 1) + " / " + n;
+  $("pfill").style.width = ((idx + 1) / n * 100) + "%";
+  $("situation").textContent = q.situation;
+  $("left").textContent = q.left;
+  $("right").textContent = q.right;
+  document.querySelectorAll(".dot").forEach(d => {
+    d.setAttribute("aria-pressed", String(answers[idx] !== undefined && Number(d.dataset.v) === answers[idx]));
+  });
+  $("backBtn").disabled = idx === 0;
+  locked = false;
+}
+
+function pick(v) {
+  if (locked) return;
+  locked = true;
+  answers[idx] = v;
+  document.querySelectorAll(".dot").forEach(d => {
+    d.setAttribute("aria-pressed", String(Number(d.dataset.v) === v));
+  });
+  setTimeout(() => {
+    if (idx < ORDER.length - 1) { idx++; render(); }
+    else finish();
+  }, reduceMotion ? 0 : 220);
+}
+
+function back() {
+  if (idx > 0) { idx--; render(); }
+}
+
+/* v runs from -2 (strongly left) to +2 (strongly right).
+   For each axis: net > 0 means leaning toward the FIRST letter (E, S, T, J). */
+function scoreAxes() {
+  return AXES.map(a => {
+    let net = 0, max = 0;
+    ORDER.forEach((q, i) => {
+      if (q.axis !== a.key) return;
+      const v = answers[i];
+      max += 2;
+      const towardLeft = -v;
+      net += (q.leftPole === a.first) ? towardLeft : -towardLeft;
+    });
+    const pct1 = max ? Math.round((net + max) / (2 * max) * 100) : 50;
+    return { ...a, pct1, pct2: 100 - pct1, close: Math.abs(pct1 - 50) <= 10 };
+  });
+}
+
+function finish() {
+  const scores = scoreAxes();
+  const letters = scores.map(s => s.pct1 >= 50 ? s.first : s.second);
+  const code = letters.join("");
+
+  const boxes = $("typeBoxes");
+  boxes.innerHTML = "";
+  scores.forEach((s, i) => {
+    const d = document.createElement("div");
+    d.className = "letter" + (s.close ? " close" : "");
+    d.textContent = s.close ? s.first + "/" + s.second : letters[i];
+    d.style.animationDelay = (i * 0.12) + "s";
+    boxes.appendChild(d);
+  });
+
+  const closeAxes = scores.filter(s => s.close);
+  const note = $("closeNote");
+  const about = $("about");
+  about.hidden = false;
+  if (closeAxes.length === scores.length) {
+    note.textContent = "You're near the middle on all four, so no single type fits cleanly. Try again and go with your first instinct.";
+    note.hidden = false;
+    about.hidden = true;
+  } else if (closeAxes.length) {
+    const closest = closeAxes.slice().sort((a, b) => Math.abs(a.pct1 - 50) - Math.abs(b.pct1 - 50))[0];
+    const alt = letters.slice();
+    const k = scores.indexOf(closest);
+    alt[k] = alt[k] === closest.first ? closest.second : closest.first;
+    note.textContent = "Close call on: " + closeAxes.map(s => s.label.toLowerCase()).join(", ") +
+      ". You could just as well be " + alt.join("") + ".";
+    note.hidden = false;
+  } else {
+    note.hidden = true;
+  }
+
+  const bars = $("bars");
+  bars.innerHTML = "";
+  scores.forEach(s => {
+    const firstWins = s.pct1 >= s.pct2;
+    const row = document.createElement("div");
+    row.className = "bar";
+    row.innerHTML =
+      '<div class="axname"></div>' +
+      '<div class="row"><span class="' + (firstWins ? "win" : "") + '">' + s.first + " " + s.pct1 + '%</span>' +
+      '<span class="' + (firstWins ? "" : "win") + '">' + s.pct2 + "% " + s.second + '</span></div>' +
+      '<div class="tr"><div class="f ' + (firstWins ? "first" : "second") + '"></div></div>';
+    row.querySelector(".axname").textContent = s.label;
+    bars.appendChild(row);
+    const fill = row.querySelector(".f");
+    const w = Math.max(s.pct1, s.pct2);
+    requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = w + "%"; }));
+  });
+
+  const info = TYPES[code];
+  $("aboutTitle").textContent = "A closer look at " + code;
+  const ul = $("aboutLines");
+  ul.innerHTML = "";
+  info.lines.forEach(t => { const li = document.createElement("li"); li.textContent = t; ul.appendChild(li); });
+  const weak = $("aboutWeak");
+  weak.textContent = "";
+  const strong = document.createElement("strong");
+  strong.textContent = "Watch out for: ";
+  weak.appendChild(strong);
+  weak.appendChild(document.createTextNode(info.weak));
+
+  show("result");
+  $("resultEyebrow").focus({ preventScroll: true });
+}
+
+function begin() {
+  idx = 0;
+  answers = [];
+  show("quiz");
+  render();
+  $("situation").focus({ preventScroll: true });
+}
+
+function init() {
+  $("count").textContent = ORDER.length;
+  $("mins").textContent = Math.max(1, Math.round(ORDER.length * 10 / 60));
+  buildDots();
+  $("startBtn").addEventListener("click", begin);
+  $("backBtn").addEventListener("click", back);
+  $("retakeBtn").addEventListener("click", () => { show("start"); });
+  document.addEventListener("keydown", (e) => {
+    if ($("quiz").hidden) return;
+    if (e.key >= "1" && e.key <= "5") pick(Number(e.key) - 3);
+    else if (e.key === "Backspace") back();
+  });
+}
+init();
+</script>
+</body>
+</html>

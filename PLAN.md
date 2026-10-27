@@ -1,6 +1,6 @@
 # MBTI Quiz by Frianz13 — build plan for Sonnet
 
-**Owner:** Frianz (@Frianz13). **Planner:** Opus. **Builder:** Sonnet.
+**Owner:** Frianz (@Frianz13). **Planner:** Opus. **Builder:** Sonnet (building as of 27 Oct 2026).
 **Target repo:** `Frianz13/mbti-quiz-lite` (created by her 27 Oct 2026).
 **Starting point:** her existing `MBTI Quiz.html` (kept unchanged at `original/MBTI_Quiz.html`) (single file, ~1,600 lines). **Read by the planner on 27 Oct 2026; findings are in section 2.**
 
@@ -13,7 +13,7 @@
 | Language | **English only**, like the original |
 | Look | **"UI lebih manusiawi"**. Outside references are welcome |
 | Questions | Add more relatable ones, or replace (her call: optional) → **recommendation below: replace** |
-| Results art slot | **Still open. Ask her before building.** |
+| Pictures / art slot | **None.** She never asked for images. Pure UI and text, no image slots, no illustrations |
 
 Her brief, verbatim: *"Modifnya biar gak jd kayak AI slop njir, terus tambahin pertanyaan2 yg lebih relate, atau ganti (opsional)."*
 
@@ -86,9 +86,6 @@ accent 3     muted blue           #9CC3E6   (one per axis is fine)
 - The 5 answer buttons become **5 dots or 5 blocks on a line** between two statements (see 4), not a vertical list of emoji rows.
 - One small, deliberate animation is fine (e.g. the result letters "stamping" in). Not on everything.
 
-### Space for her
-- Leave a clearly marked empty slot (header illustration and/or per-type image) **only if she says yes to the open question**. Never fill it with AI images.
-
 ---
 
 ## 4. Questions: replace all 40 with relatable, two-sided items
@@ -136,9 +133,9 @@ All items in one array at the top of the script so she can edit text without tou
 
 ---
 
-## 6. Open question — ask her once before building
+## 6. Open questions
 
-**Results art:** leave an empty slot for her own illustrations later, or text-only for now?
+None. Everything is decided.
 
 ---
 
