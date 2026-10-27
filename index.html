@@ -239,7 +239,8 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
 /* ---------- DATA: edit questions here ----------
    Each item: axis, a concrete situation, two statements (left / right),
    and which pole the LEFT statement points to. Left/right is mixed on purpose
-   so there is no "always agree" pattern. 7 per axis keeps ties impossible. */
+   so always picking one side does not push the result toward one type. Keep the
+   same number of items per axis. Ties can still happen and are handled. */
 const AXES = [
   { key: "EI", color: "var(--yellow)", first: "E", second: "I", label: "Social energy" },
   { key: "SN", color: "var(--pink)", first: "S", second: "N", label: "How you take in information" },
