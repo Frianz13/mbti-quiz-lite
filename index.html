@@ -118,6 +118,24 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
 .weak { background: var(--blue); border: var(--line); border-radius: 8px; padding: 10px 12px; margin: 0 0 14px; }
 .foot { font-size: .9rem; margin: 22px 0; }
 
+/* ranking */
+.rank { margin-top: 28px; }
+.rank h2 { font-size: 1.3rem; margin-bottom: 4px; }
+.rank .small { margin: 0 0 14px; }
+.rk { border: var(--line); border-radius: 8px; background: var(--white); margin-bottom: 10px; }
+.rk summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 8px 12px; min-height: 48px; cursor: pointer; font-weight: 800; }
+.rk summary::-webkit-details-marker { display: none; }
+.rk summary::after { content: "+"; margin-left: 2px; font-size: 1.3rem; }
+.rk[open] summary::after { content: "-"; }
+.rk .n { width: 26px; text-align: center; }
+.rk .c { width: 64px; letter-spacing: .04em; }
+.rk .meter { flex: 1; height: 14px; border: 2px solid var(--ink); border-radius: 5px; background: var(--white); overflow: hidden; }
+.rk .meter i { display: block; height: 100%; background: var(--yellow); border-right: 2px solid var(--ink); }
+.rk .body { padding: 2px 14px 2px; border-top: 2px solid var(--ink); }
+.rk ul { margin: 10px 0; padding-left: 20px; }
+.rk .weak { margin: 0 0 12px; }
+#rankMore { margin-top: 6px; }
+
 @media (max-width: 400px) {
   h1 { font-size: 1.7rem; }
   #situation { font-size: 1.3rem; }
@@ -154,7 +172,7 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
   </section>
 
   <section id="result" hidden>
-    <p class="eyebrow" id="resultEyebrow" tabindex="-1">Your result</p>
+    <p class="eyebrow" id="resultEyebrow" tabindex="-1">Your best fit</p>
     <div class="type" id="typeBoxes"></div>
     <p class="note" id="closeNote" hidden></p>
     <div id="bars"></div>
@@ -162,6 +180,12 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
       <h2 id="aboutTitle"></h2>
       <ul id="aboutLines"></ul>
       <p class="weak" id="aboutWeak"></p>
+    </div>
+    <div class="rank" id="rank">
+      <h2>The other types, closest first</h2>
+      <p class="small">Ranked by how well each type matches your four scores above. It's a fit ranking, not a probability. Tap one to read it.</p>
+      <div id="rankList"></div>
+      <button class="btn ghost" id="rankMore" type="button">Show all 16</button>
     </div>
     <p class="foot">MBTI is a fun lens for self-reflection, not a scientific diagnosis.</p>
     <button class="btn" id="retakeBtn" type="button">Retake</button>
@@ -396,10 +420,28 @@ function scoreAxes() {
   });
 }
 
+/* Fit score for each of the 16 types: multiply the four axis shares.
+   The 16 scores always add up to 1, and the top one matches the letters above. */
+function rankTypes(scores) {
+  const out = [];
+  for (let m = 0; m < 16; m++) {
+    let code = "", score = 1;
+    scores.forEach((s, i) => {
+      const second = (m >> (3 - i)) & 1;
+      code += second ? s.second : s.first;
+      score *= (second ? s.pct2 : s.pct1) / 100;
+    });
+    out.push({ code, score });
+  }
+  out.sort((a, b) => b.score - a.score); /* stable: ties keep first-letter-first order */
+  return out;
+}
+
 function finish() {
   const scores = scoreAxes();
-  const letters = scores.map(s => s.pct1 >= 50 ? s.first : s.second);
-  const code = letters.join("");
+  const ranking = rankTypes(scores);
+  const code = ranking[0].code;
+  const letters = code.split("");
 
   const boxes = $("typeBoxes");
   boxes.innerHTML = "";
@@ -414,18 +456,17 @@ function finish() {
   const closeAxes = scores.filter(s => s.close);
   const note = $("closeNote");
   const about = $("about");
+  const rank = $("rank");
   about.hidden = false;
+  rank.hidden = false;
   if (closeAxes.length === scores.length) {
     note.textContent = "You're near the middle on all four, so no single type fits cleanly. Try again and go with your first instinct.";
     note.hidden = false;
     about.hidden = true;
+    rank.hidden = true;
   } else if (closeAxes.length) {
-    const closest = closeAxes.slice().sort((a, b) => Math.abs(a.pct1 - 50) - Math.abs(b.pct1 - 50))[0];
-    const alt = letters.slice();
-    const k = scores.indexOf(closest);
-    alt[k] = alt[k] === closest.first ? closest.second : closest.first;
     note.textContent = "Close call on: " + closeAxes.map(s => s.label.toLowerCase()).join(", ") +
-      ". You could just as well be " + alt.join("") + ".";
+      ". Check the runner-ups below.";
     note.hidden = false;
   } else {
     note.hidden = true;
@@ -461,8 +502,43 @@ function finish() {
   weak.appendChild(strong);
   weak.appendChild(document.createTextNode(info.weak));
 
+  const list = $("rankList");
+  list.innerHTML = "";
+  const top = ranking[0].score;
+  ranking.slice(1).forEach((r, i) => {
+    const rankNo = i + 2;
+    const d = document.createElement("details");
+    d.className = "rk";
+    if (rankNo > 5) d.dataset.extra = "1";
+    const w = Math.round(r.score / top * 100);
+    const t = TYPES[r.code];
+    d.innerHTML =
+      '<summary><span class="n"></span><span class="c"></span>' +
+      '<span class="meter"><i></i></span></summary>' +
+      '<div class="body"><ul></ul><p class="weak"></p></div>';
+    d.querySelector(".n").textContent = rankNo;
+    d.querySelector(".c").textContent = r.code;
+    const bar = d.querySelector(".meter i");
+    bar.style.width = w + "%";
+    if (w === 0) bar.style.borderRight = "none";
+    t.lines.forEach(x => { const li = document.createElement("li"); li.textContent = x; d.querySelector("ul").appendChild(li); });
+    const wk = d.querySelector(".weak");
+    const st = document.createElement("strong");
+    st.textContent = "Watch out for: ";
+    wk.appendChild(st);
+    wk.appendChild(document.createTextNode(t.weak));
+    list.appendChild(d);
+  });
+  setRankExpanded(false);
+
   show("result");
   $("resultEyebrow").focus({ preventScroll: true });
+}
+
+function setRankExpanded(expanded) {
+  document.querySelectorAll("#rankList .rk").forEach(d => { d.hidden = !expanded && !!d.dataset.extra; });
+  $("rankMore").textContent = expanded ? "Show fewer" : "Show all 16";
+  $("rankMore").dataset.expanded = expanded ? "1" : "";
 }
 
 function begin() {
@@ -479,6 +555,7 @@ function init() {
   buildDots();
   $("startBtn").addEventListener("click", begin);
   $("backBtn").addEventListener("click", back);
+  $("rankMore").addEventListener("click", () => setRankExpanded(!$("rankMore").dataset.expanded));
   $("retakeBtn").addEventListener("click", () => { show("start"); });
   document.addEventListener("keydown", (e) => {
     if ($("quiz").hidden) return;

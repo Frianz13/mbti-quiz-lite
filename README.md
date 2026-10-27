@@ -9,6 +9,7 @@ One file, no frameworks, no tracking. Works offline once loaded.
 - 28 situations, 7 per axis (E/I, S/N, T/F, J/P). Each one has two statements and a 5-point scale between them.
 - Left/right is mixed on purpose, so clicking "agree" on everything lands you in the middle instead of on one type.
 - Each axis is shown as a percentage. Within 10% of 50 it counts as a close call and both letters are shown.
+- All 16 types are ranked by fit (the four axis shares multiplied together). #1 is shown big with its description; the rest are tap-to-open rows, top 5 first and "Show all 16" for the rest. It is a fit ranking, not a probability.
 - Nothing is stored or sent anywhere.
 
 ## Edit the questions
