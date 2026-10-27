@@ -54,6 +54,7 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
   padding: 12px 28px; min-height: 48px; cursor: pointer;
   box-shadow: 4px 4px 0 var(--ink);
 }
+.btn, .dot, .rk summary { touch-action: manipulation; }
 .btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
 .btn.ghost { background: var(--white); }
 .btn[disabled] { opacity: .45; cursor: default; }
@@ -339,6 +340,7 @@ const ORDER = interleave(QUESTIONS);
 let idx = 0;
 let answers = [];
 let locked = false;
+let advanceTimer = null;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const $ = (id) => document.getElementById(id);
@@ -393,14 +395,21 @@ function pick(v) {
   document.querySelectorAll(".dot").forEach(d => {
     d.setAttribute("aria-pressed", String(Number(d.dataset.v) === v));
   });
-  setTimeout(() => {
+  advanceTimer = setTimeout(() => {
+    advanceTimer = null;
     if (idx < ORDER.length - 1) { idx++; render(); }
     else finish();
   }, reduceMotion ? 0 : 220);
 }
 
+function cancelAdvance() {
+  if (advanceTimer) { clearTimeout(advanceTimer); advanceTimer = null; }
+}
+
 function back() {
+  cancelAdvance();
   if (idx > 0) { idx--; render(); }
+  else render();
 }
 
 /* v runs from -2 (strongly left) to +2 (strongly right).
@@ -438,6 +447,8 @@ function rankTypes(scores) {
 }
 
 function finish() {
+  const missing = ORDER.findIndex((q, i) => answers[i] === undefined);
+  if (missing !== -1) { idx = missing; render(); return; }
   const scores = scoreAxes();
   const ranking = rankTypes(scores);
   const code = ranking[0].code;
@@ -542,6 +553,7 @@ function setRankExpanded(expanded) {
 }
 
 function begin() {
+  cancelAdvance();
   idx = 0;
   answers = [];
   show("quiz");
@@ -558,8 +570,8 @@ function init() {
   $("rankMore").addEventListener("click", () => setRankExpanded(!$("rankMore").dataset.expanded));
   $("retakeBtn").addEventListener("click", () => { show("start"); });
   document.addEventListener("keydown", (e) => {
-    if ($("quiz").hidden) return;
-    if (e.key >= "1" && e.key <= "5") pick(Number(e.key) - 3);
+    if ($("quiz").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (/^[1-5]$/.test(e.key)) pick(Number(e.key) - 3);
     else if (e.key === "Backspace") back();
   });
 }
