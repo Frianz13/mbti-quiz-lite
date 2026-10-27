@@ -12,6 +12,7 @@
   --yellow: #FCD98A;
   --pink: #F7B6C2;
   --blue: #9CC3E6;
+  --green: #BFE3B4;
   --white: #FFFFFF;
   --line: 3px solid var(--ink);
   --shadow: 5px 5px 0 var(--ink);
@@ -102,7 +103,7 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
   background: var(--yellow); border: var(--line); border-radius: 10px; box-shadow: var(--shadow);
   font-size: 2.6rem; font-weight: 800; animation: stamp .25s ease-out both;
 }
-.letter.close { background: var(--pink); font-size: 1.5rem; }
+.letter.close { border-style: dashed; font-size: 1.5rem; }
 @keyframes stamp { from { transform: scale(1.35); opacity: 0; } to { transform: none; opacity: 1; } }
 .note { border: var(--line); border-radius: 10px; background: var(--white); padding: 10px 14px; margin: 0 0 24px; font-size: .98rem; }
 .bar { margin: 16px 0; }
@@ -111,8 +112,8 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
 .bar .row .win { font-weight: 800; }
 .bar .tr { height: 24px; border: var(--line); border-radius: 6px; background: var(--white); display: flex; overflow: hidden; }
 .bar .f { height: 100%; width: 0; transition: width .5s; }
-.bar .f.first { background: var(--yellow); border-right: var(--line); }
-.bar .f.second { background: var(--pink); border-left: var(--line); margin-left: auto; }
+.bar .f.first { border-right: var(--line); }
+.bar .f.second { border-left: var(--line); margin-left: auto; }
 .about { margin-top: 28px; border: var(--line); border-radius: 10px; background: var(--white); box-shadow: var(--shadow); padding: 18px 18px 8px; }
 .about h2 { font-size: 1.3rem; margin-bottom: 8px; }
 .about ul { margin: 0 0 14px; padding-left: 20px; }
@@ -240,10 +241,10 @@ h1 { font-size: 2rem; margin-bottom: 16px; }
    and which pole the LEFT statement points to. Left/right is mixed on purpose
    so there is no "always agree" pattern. 7 per axis keeps ties impossible. */
 const AXES = [
-  { key: "EI", first: "E", second: "I", label: "Social energy" },
-  { key: "SN", first: "S", second: "N", label: "How you take in information" },
-  { key: "TF", first: "T", second: "F", label: "How you decide" },
-  { key: "JP", first: "J", second: "P", label: "How you handle plans" }
+  { key: "EI", color: "var(--yellow)", first: "E", second: "I", label: "Social energy" },
+  { key: "SN", color: "var(--pink)", first: "S", second: "N", label: "How you take in information" },
+  { key: "TF", color: "var(--blue)", first: "T", second: "F", label: "How you decide" },
+  { key: "JP", color: "var(--green)", first: "J", second: "P", label: "How you handle plans" }
 ];
 
 const QUESTIONS = [
@@ -500,6 +501,7 @@ function finish() {
   scores.forEach((s, i) => {
     const d = document.createElement("div");
     d.className = "letter" + (s.close ? " close" : "");
+    d.style.background = s.color;
     d.textContent = s.close ? s.first + "/" + s.second : letters[i];
     d.style.animationDelay = (i * 0.12) + "s";
     boxes.appendChild(d);
@@ -517,7 +519,7 @@ function finish() {
     about.hidden = true;
     rank.hidden = true;
   } else if (closeAxes.length) {
-    note.textContent = "Close call on: " + closeAxes.map(s => s.label.toLowerCase()).join(", ") +
+    note.textContent = "The dashed boxes are close calls: " + closeAxes.map(s => s.label.toLowerCase()).join(", ") +
       ". Check the runner-ups below.";
     note.hidden = false;
   } else {
@@ -538,6 +540,7 @@ function finish() {
     row.querySelector(".axname").textContent = s.label;
     bars.appendChild(row);
     const fill = row.querySelector(".f");
+    fill.style.background = s.color;
     const w = Math.max(s.pct1, s.pct2);
     requestAnimationFrame(() => requestAnimationFrame(() => { fill.style.width = w + "%"; }));
   });
