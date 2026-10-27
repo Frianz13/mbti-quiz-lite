@@ -10,6 +10,7 @@ One file, no frameworks, no tracking. Works offline once loaded.
 - Left/right is mixed on purpose, so clicking "agree" on everything lands you in the middle instead of on one type.
 - Each axis is shown as a percentage. Within 10% of 50 it counts as a close call and both letters are shown.
 - All 16 types are ranked by fit (the four axis shares multiplied together). #1 is shown big with its description; the rest are tap-to-open rows, top 5 first and "Show all 16" for the rest. It is a fit ranking, not a probability.
+- Responsive: phones get one column (A over B). From 720px up, A and B sit side by side and the result splits into two columns. Mouse and keyboard devices also see a shortcut hint (keys 1 to 5, Backspace).
 - Nothing is stored or sent anywhere.
 
 ## Edit the questions
